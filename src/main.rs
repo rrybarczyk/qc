@@ -22,6 +22,10 @@ fn run(args: impl IntoIterator<Item = impl AsRef<str>>) -> Result<Vec<f64>, Erro
     Ok(stack)
 }
 
+fn lex(text: &str) -> Vec<String> {
+    text.split_whitespace().map(str::to_string).collect()
+}
+
 fn main() -> Result<(), Error> {
     let mut args = std::env::args().collect::<Vec<String>>();
     args.remove(0);
@@ -140,176 +144,192 @@ mod tests {
     use super::*;
 
     #[test]
+    fn lex_empty() {
+        let text = "";
+        let have = lex(text);
+        let want: Vec<String> = Vec::new();
+        assert_eq!(have, want);
+    }
+
+    #[test]
+    fn lex_blank() {
+        let text = "       ";
+        let have = lex(text);
+        let want: Vec<String> = Vec::new();
+        assert_eq!(have, want);
+    }
+
+    #[test]
+    fn lex_word() {
+        let text = "foo";
+        let have = lex(text);
+        let want = vec!["foo".to_string()];
+        assert_eq!(have, want);
+    }
+
+    #[test]
+    fn lex_args() {
+        let text = "1 2 add";
+        let have = lex(text);
+        let want = vec!["1".to_string(), "2".to_string(), "add".to_string()];
+        assert_eq!(have, want);
+    }
+
+    fn test(text: &str) -> Result<Vec<f64>, Error> {
+        run(lex(text))
+    }
+
+    #[test]
     /// qc 1 2 add
     fn two_args_add() {
-        let args = &["1", "2", "add"];
-        let have = run(args).unwrap();
-        let want = vec![3.0];
+        let have = test("1 2 add");
+        let want = Ok(vec![3.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 3 add
     fn three_args_add() {
-        let args = &["1", "2", "3", "add"];
-        let have = run(args).unwrap();
-        let want = vec![1.0, 5.0];
+        let have = test("1 2 3 add");
+        let want = Ok(vec![1.0, 5.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 sub
     fn two_args_sub() {
-        let args = &["1", "2", "sub"];
-        let have = run(args).unwrap();
-        let want = vec![-1.0];
+        let have = test("1 2 sub");
+        let want = Ok(vec![-1.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 3 sub
     fn three_args_sub() {
-        let args = &["1", "2", "3", "sub"];
-        let have = run(args).unwrap();
-        let want = vec![1.0, -1.0];
+        let have = test("1 2 3 sub");
+        let want = Ok(vec![1.0, -1.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 mul
     fn two_args_mul() {
-        let args = &["1", "2", "mul"];
-        let have = run(args).unwrap();
-        let want = vec![2.0];
+        let have = test("1 2 mul");
+        let want = Ok(vec![2.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 3 mul
     fn three_args_mul() {
-        let args = &["1", "2", "3", "mul"];
-        let have = run(args).unwrap();
-        let want = vec![1.0, 6.0];
+        let have = test("1 2 3 mul");
+        let want = Ok(vec![1.0, 6.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 9 3 div
     fn two_args_div() {
-        let args = &["9", "3", "div"];
-        let have = run(args).unwrap();
-        let want = vec![3.0];
+        let have = test("9 3 div");
+        let want = Ok(vec![3.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 6 2 div
     fn three_args_div() {
-        let args = &["1", "6", "2", "div"];
-        let have = run(args).unwrap();
-        let want = vec![1.0, 3.0];
+        let have = test("1 6 2 div");
+        let want = Ok(vec![1.0, 3.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 :add
     fn two_args_add_all() {
-        let args = &["1", "2", ":add"];
-        let have = run(args).unwrap();
-        let want = vec![3.0];
+        let have = test("1 2 :add");
+        let want = Ok(vec![3.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 3 :add
     fn three_args_add_all() {
-        let args = &["1", "2", "3", ":add"];
-        let have = run(args).unwrap();
-        let want = vec![6.0];
+        let have = test("1 2 3 :add");
+        let want = Ok(vec![6.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 :sub
     fn two_args_sub_all() {
-        let args = &["1", "2", ":sub"];
-        let have = run(args).unwrap();
-        let want = vec![-1.0];
+        let have = test("1 2 :sub");
+        let want = Ok(vec![-1.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 3 :sub
     fn three_args_sub_all() {
-        let args = &["1", "2", "3", ":sub"];
-        let have = run(args).unwrap();
-        let want = vec![2.0];
+        let have = test("1 2 3 :sub");
+        let want = Ok(vec![2.0]);
         assert_eq!(have, want);
 
-        let args = &["6", "2", "1", ":sub"];
-        let have = run(args).unwrap();
-        let want = vec![5.0];
+        let have = test("6 2 1 :sub");
+        let want = Ok(vec![5.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 mul
     fn two_args_mul_all() {
-        let args = &["1", "2", ":mul"];
-        let have = run(args).unwrap();
-        let want = vec![2.0];
+        let have = test("1 2 :mul");
+        let want = Ok(vec![2.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 2 3 :mul
     fn three_args_mul_all() {
-        let args = &["1", "2", "3", ":mul"];
-        let have = run(args).unwrap();
-        let want = vec![6.0];
+        let have = test("1 2 3 :mul");
+        let want = Ok(vec![6.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 9 3 :div
     fn two_args_div_all() {
-        let args = &["9", "3", ":div"];
-        let have = run(args).unwrap();
-        let want = vec![3.0];
+        let have = test("9 3 :div");
+        let want = Ok(vec![3.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 1 6 2 :div
     fn three_args_div_all() {
-        let args = &["6", "2", "1", ":div"];
-        let have = run(args).unwrap();
-        let want = vec![3.0];
+        let have = test("6 2 1 :div");
+        let want = Ok(vec![3.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 4 7 9 add 2 8 mul
     fn three_add_two_mul() {
-        let args = &["4", "7", "9", "add", "2", "8", "mul"];
-        let have = run(args).unwrap();
-        let want = vec![4.0, 16.0, 16.0];
+        let have = test("4 7 9 add 2 8 mul");
+        let want = Ok(vec![4.0, 16.0, 16.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     /// qc 4 7 9 add add 2 8 mul mul
     fn three_add_add_two_mul_mul() {
-        let args = &["4", "7", "9", "add", "add", "2", "8", "mul", "mul"];
-        let have = run(args).unwrap();
-        let want = vec![320.0];
+        let have = test("4 7 9 add add 2 8 mul mul");
+        let want = Ok(vec![320.0]);
         assert_eq!(have, want);
     }
 
     #[test]
     fn stack_underflow() {
-        let args = &["1", "add"];
-        let have = run(args);
+        let have = test("1 add");
         let want = Err(Error::StackUnderflow);
         assert_eq!(have, want);
     }
