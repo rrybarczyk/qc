@@ -9,6 +9,18 @@ qc (short for quick calc) is an enhanced Reverse Polish notation (RPN) command l
 
 qc offers enhancements to a traditional RPN calculator including the use of a `:` before all operators that pops all items before it off the stack, performs the operation, and pushes the result onto the stack. Examples are included below.
 
+## Operations
+### Binary Operators
+- `add`     pops the top two items off the stack, adds them, and pushes the sum onto the stack
+- `sub`     pops the top two items off the stack, subtracts them, and pushes the difference onto the stack
+- `mul`     pops the top two items off the stack, multiplies them, and pushes the product onto the stack
+- `div`     pops the top two items off the stack, divides them, and pushes the quotient onto the stack
+- `:<binary operator>` pops all previous items off the stack, folds the values of the stack together using binary operator, and pushes the result onto the stack
+
+### Unary Operators
+- `endian`  pops the top item off of the stack, swaps the endianness, and pushes the result onto the stack
+- `:<unary operator>` maps the unary operator over the current stack items
+
 ## Examples
 ### Traditional RPN Capabilities
 #### Addition
