@@ -1,0 +1,10 @@
+[package]
+name        = "qc"
+version     = "0.1.0"
+authors     = ["RJ Rybarczyk <rj@rybar.tech>"]
+description = "A cli tool for quick binary, octal, decimal, hexadecimal calcs"
+license     = "CC0-1.0"
+edition     = "2018"
+
+[dependencies]
+structopt = "0.3.4"
