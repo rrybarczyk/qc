@@ -15,6 +15,7 @@ fn run(args: impl IntoIterator<Item = impl AsRef<str>>) -> Result<Vec<f64>, Erro
             ":sub" => sub_all(&mut stack)?,
             ":mul" => mul_all(&mut stack)?,
             ":div" => div_all(&mut stack)?,
+            "pop" => pop(&mut stack).map(|_| ())?,
             "." => pop_print(&mut stack)?,
             _ => num(&mut stack, arg),
         }
@@ -143,6 +144,45 @@ fn num(stack: &mut Vec<f64>, arg: &str) {
 mod tests {
     use super::*;
 
+    /* Test helper function and macros */
+
+    fn test(text: &str) -> Result<Vec<f64>, Error> {
+        run(lex(text))
+    }
+
+    /// Tests intended to succeed
+    macro_rules! test {
+        {
+            name: $name:ident,
+            text: $text:expr,
+            want: $want:expr $(,)?
+        } => {
+            #[test]
+            fn $name() {
+                let have = test($text).expect("Expected success");
+                let want = $want.iter().cloned().map(|x| x as f64).collect::<Vec<f64>>();
+                assert_eq!(have, want);
+            }
+        };
+    }
+
+    /// Tests intended to fail
+    macro_rules! error {
+        {
+            name: $name:ident,
+            text: $text:expr,
+            want: $want:expr $(,)?
+        } => {
+            #[test]
+            fn $name() {
+                let have = test($text).expect_err("Expected error");
+                let want = $want;
+                assert_eq!(have, want);
+            }
+        };
+    }
+
+    /// Test lexer
     #[test]
     fn lex_empty() {
         let text = "";
@@ -175,162 +215,156 @@ mod tests {
         assert_eq!(have, want);
     }
 
-    fn test(text: &str) -> Result<Vec<f64>, Error> {
-        run(lex(text))
+    /* Test errors */
+
+    // Error when popping on empty stack
+    // $ qc pop
+    error! {
+        name: pop_empty,
+        text: "pop",
+        want: Error::StackUnderflow,
     }
 
-    #[test]
-    /// qc 1 2 add
-    fn two_args_add() {
-        let have = test("1 2 add");
-        let want = Ok(vec![3.0]);
-        assert_eq!(have, want);
+    // $ qc 1 add
+    error! {
+        name: add_underflow,
+        text: "1 add",
+        want: Error::StackUnderflow,
     }
 
-    #[test]
-    /// qc 1 2 3 add
-    fn three_args_add() {
-        let have = test("1 2 3 add");
-        let want = Ok(vec![1.0, 5.0]);
-        assert_eq!(have, want);
+    /* Test add */
+
+    // $qc 1 2 add
+    test! {
+        name: add_two_args,
+        text: "1 2 add",
+        want: [3],
     }
 
-    #[test]
-    /// qc 1 2 sub
-    fn two_args_sub() {
-        let have = test("1 2 sub");
-        let want = Ok(vec![-1.0]);
-        assert_eq!(have, want);
+    // $qc 1 2 3 add
+    test! {
+        name: add_three_args,
+        text: "1 2 3 add",
+        want: [1, 5],
     }
 
-    #[test]
-    /// qc 1 2 3 sub
-    fn three_args_sub() {
-        let have = test("1 2 3 sub");
-        let want = Ok(vec![1.0, -1.0]);
-        assert_eq!(have, want);
+    // $qc 1 2 :add
+    test! {
+        name: add_all_two_args,
+        text: "1 2 :add",
+        want: [3],
     }
 
-    #[test]
-    /// qc 1 2 mul
-    fn two_args_mul() {
-        let have = test("1 2 mul");
-        let want = Ok(vec![2.0]);
-        assert_eq!(have, want);
+    // $qc 1 2 3 :add
+    test! {
+        name: add_all_three_args,
+        text: "1 2 3 :add",
+        want: [6],
     }
 
-    #[test]
-    /// qc 1 2 3 mul
-    fn three_args_mul() {
-        let have = test("1 2 3 mul");
-        let want = Ok(vec![1.0, 6.0]);
-        assert_eq!(have, want);
+    /* Test sub */
+
+    // $ qc 1 2 sub
+    test! {
+        name: sub_two_args,
+        text: "1 2 sub",
+        want: [-1],
     }
 
-    #[test]
-    /// qc 9 3 div
-    fn two_args_div() {
-        let have = test("9 3 div");
-        let want = Ok(vec![3.0]);
-        assert_eq!(have, want);
+    // $ qc 1 2 3 sub
+    test! {
+        name: sub_three_args,
+        text: "1 2 3 sub",
+        want: [1, -1],
     }
 
-    #[test]
-    /// qc 1 6 2 div
-    fn three_args_div() {
-        let have = test("1 6 2 div");
-        let want = Ok(vec![1.0, 3.0]);
-        assert_eq!(have, want);
+    // $ qc 1 2 :sub
+    test! {
+        name: sub_all_two_args,
+        text: "1 2 :sub",
+        want: [-1],
     }
 
-    #[test]
-    /// qc 1 2 :add
-    fn two_args_add_all() {
-        let have = test("1 2 :add");
-        let want = Ok(vec![3.0]);
-        assert_eq!(have, want);
+    // $qc 1 2 3 :sub
+    test! {
+        name: sub_all_three_args,
+        text: "1 2 3 :sub",
+        want: [2],
     }
 
-    #[test]
-    /// qc 1 2 3 :add
-    fn three_args_add_all() {
-        let have = test("1 2 3 :add");
-        let want = Ok(vec![6.0]);
-        assert_eq!(have, want);
+    /* Test mul */
+
+    // $ qc 2 3 mul
+    test! {
+        name: mul_two_args,
+        text: "2 3 mul",
+        want: [6],
     }
 
-    #[test]
-    /// qc 1 2 :sub
-    fn two_args_sub_all() {
-        let have = test("1 2 :sub");
-        let want = Ok(vec![-1.0]);
-        assert_eq!(have, want);
+    // $ qc 1 2 3 mul
+    test! {
+        name: mul_three_args,
+        text: "1 2 3 mul",
+        want: [1, 6],
     }
 
-    #[test]
-    /// qc 1 2 3 :sub
-    fn three_args_sub_all() {
-        let have = test("1 2 3 :sub");
-        let want = Ok(vec![2.0]);
-        assert_eq!(have, want);
-
-        let have = test("6 2 1 :sub");
-        let want = Ok(vec![5.0]);
-        assert_eq!(have, want);
+    // $ qc 2 4 :mul
+    test! {
+        name: mul_all_two_args,
+        text: "2 4 :mul",
+        want: [8],
     }
 
-    #[test]
-    /// qc 1 2 mul
-    fn two_args_mul_all() {
-        let have = test("1 2 :mul");
-        let want = Ok(vec![2.0]);
-        assert_eq!(have, want);
+    // $ qc 1 2 3 :mul
+    test! {
+        name: mul_all_three_args,
+        text: "1 2 3 :mul",
+        want: [6],
     }
 
-    #[test]
-    /// qc 1 2 3 :mul
-    fn three_args_mul_all() {
-        let have = test("1 2 3 :mul");
-        let want = Ok(vec![6.0]);
-        assert_eq!(have, want);
+    /* Test div */
+
+    // $ qc 9 3 div
+    test! {
+        name: div_two_args,
+        text: "9 3 div",
+        want: [3],
     }
 
-    #[test]
-    /// qc 9 3 :div
-    fn two_args_div_all() {
-        let have = test("9 3 :div");
-        let want = Ok(vec![3.0]);
-        assert_eq!(have, want);
+    // $ qc 1 6 2 div
+    test! {
+        name: div_three_args,
+        text: "1 6 2 div",
+        want: [1, 3],
     }
 
-    #[test]
-    /// qc 1 6 2 :div
-    fn three_args_div_all() {
-        let have = test("6 2 1 :div");
-        let want = Ok(vec![3.0]);
-        assert_eq!(have, want);
+    // $ qc 9 3 :div
+    test! {
+        name: div_all_two_args,
+        text: "9 3 :div",
+        want: [3],
     }
 
-    #[test]
-    /// qc 4 7 9 add 2 8 mul
-    fn three_add_two_mul() {
-        let have = test("4 7 9 add 2 8 mul");
-        let want = Ok(vec![4.0, 16.0, 16.0]);
-        assert_eq!(have, want);
+    // $ qc 6 2 1 :div
+    test! {
+        name: div_all_three_args,
+        text: "6 2 1 :div",
+        want: [3],
     }
 
-    #[test]
-    /// qc 4 7 9 add add 2 8 mul mul
-    fn three_add_add_two_mul_mul() {
-        let have = test("4 7 9 add add 2 8 mul mul");
-        let want = Ok(vec![320.0]);
-        assert_eq!(have, want);
+    /* Test miscellaneous binary calcs */
+
+    // $ qc 4 7 9 add 2 8 mul
+    test! {
+        name: add_three_mul_two,
+        text: "4 7 9 add 2 8 mul",
+        want: [4, 16, 16],
     }
 
-    #[test]
-    fn stack_underflow() {
-        let have = test("1 add");
-        let want = Err(Error::StackUnderflow);
-        assert_eq!(have, want);
+    // $ qc 4 7 9 add add 2 8 mul mul
+    test! {
+        name: add_two_mul_two,
+        text: "4 7 9 add add 2 8 mul mul",
+        want: [320],
     }
 }

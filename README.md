@@ -18,6 +18,8 @@ qc offers enhancements to a traditional RPN calculator including the use of a `:
 - `:<binary operator>` pops all previous items off the stack, folds the values of the stack together using binary operator, and pushes the result onto the stack
 
 ### Unary Operators
+- `.` pops the top item off the stack and prints it
+- `pop` pops the top item off the stack
 - `endian`  pops the top item off of the stack, swaps the endianness, and pushes the result onto the stack
 - `:<unary operator>` maps the unary operator over the current stack items
 
