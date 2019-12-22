@@ -10,6 +10,9 @@ test-print:
 build: 
 	cargo build --release
 
+run:
+    cargo run -- 4 5 6 :mul .
+
 publish:
 	cargo build
 	cargo publish
