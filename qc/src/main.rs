@@ -28,6 +28,7 @@ fn lex(text: &str) -> Vec<String> {
 }
 
 fn main() -> Result<(), Error> {
+    println!("{}", fbase::dec2hex(4.444));
     let mut args = std::env::args().collect::<Vec<String>>();
     args.remove(0);
     run(&args)?;

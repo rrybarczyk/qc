@@ -1,0 +1,12 @@
+[package]
+name        = "qc"
+version     = "0.1.0"
+authors     = ["RJ Rybarczyk <rj@rybar.tech>"]
+homepage    = "https://github.com/rrybarczyk/qc"
+description = "An enhanced RPN cli tool for quick binary, octal, decimal, hexadecimal calcs."
+license     = "CC0-1.0"
+edition     = "2018"
+
+
+[dependencies]
+fbase       = { path = "../fbase" }
