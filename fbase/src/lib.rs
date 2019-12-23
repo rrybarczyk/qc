@@ -60,11 +60,11 @@ mod tests {
     // 3020.0625_10 to BCC.10_16
     fn decimal_to_hexadecimal() {
         let have = dec2base(3020.0625, 16);
-        let want = ("BCC".to_string(), "1".to_string(), 1, 16, 1);
+        let want = ("0xBCC".to_string(), "1".to_string(), 1, 16, 1);
         assert_eq!(have, want);
 
         let have = dec2base(0.0628, 16);
-        let want = ("0".to_string(), "1013".to_string(), 4, 16, 0);
+        let want = ("0x0".to_string(), "1013".to_string(), 4, 16, 0);
         assert_eq!(have, want);
     }
 }
