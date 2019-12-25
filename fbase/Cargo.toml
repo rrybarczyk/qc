@@ -1,8 +1,8 @@
 [package]
-name        = "fbase"
+name        = "bignum"
 version     = "0.1.0"
 authors     = ["RJ Rybarczyk <rj@rybar.tech>"]
 edition     = "2018"
-homepage    = "https://github.com/rrybarczyk/qc"
+homepage    = "https://github.com/rrybarczyk/qc/bignum"
 description = "Handles floats for various number systems."
 license     = "CC0-1.0"

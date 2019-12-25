@@ -28,7 +28,6 @@ fn lex(text: &str) -> Vec<String> {
 }
 
 fn main() -> Result<(), Error> {
-    println!("{}", fbase::dec2hex(4.444));
     let mut args = std::env::args().collect::<Vec<String>>();
     args.remove(0);
     run(&args)?;
@@ -36,8 +35,12 @@ fn main() -> Result<(), Error> {
 }
 
 fn pop_print(stack: &mut Vec<f64>) -> Result<(), Error> {
-    let item = pop(stack)?;
-    println!("{}", item);
+    let dec = pop(stack)?;
+    let hex = fbase::dec2hex(dec);
+    // let oct = fbase::dec2oct(dec);
+    // let bin = fbase::dec2bin(dec);
+    println!("dec: {}\t\thex: {}", dec, hex);
+    // println!("dec: {}\t\thex: {}\t\toct: {}\t\tbin:{}", dec, hex, oct, bin);
     Ok(())
 }
 
