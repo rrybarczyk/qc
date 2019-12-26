@@ -185,6 +185,12 @@ Script                  Stack                   Details
 :div                    [ 150 ]                 600 / (20 / 5)
 
 > dec: 150        hex: 0x96          oct: o226        bin: b10010110 
+
+$ qc 0xa xb o22 b1101 :.
+> dec: 13         hex: 0xd           oct: o15         bin: b1101
+> dec: 18         hex: 0x12          oct: o22         bin: b10010
+> dec: 11         hex: 0xb           oct: o13         bin: b1011
+> dec: 10         hex: 0xa           oct: o12         bin: b1010
 ```
 
 ### Printing
@@ -199,6 +205,18 @@ $ qc 32 8 div .
 $ qc 1 2 3 :add 4 5 :mul .
 > dec: 120        hex: 0x78          oct: o170        bin: b1111000
 
+
+$ qc 0xa . xb . o22 . b1101 .
+> dec: 10         hex: 0xa           oct: o12         bin: b1010
+> dec: 11         hex: 0xb           oct: o13         bin: b1011
+> dec: 18         hex: 0x12          oct: o22         bin: b10010
+> dec: 13         hex: 0xd           oct: o15         bin: b1101
+
+$ qc 0xa xb o22 b1101 :.
+> dec: 13         hex: 0xd           oct: o15         bin: b1101
+> dec: 18         hex: 0x12          oct: o22         bin: b10010
+> dec: 11         hex: 0xb           oct: o13         bin: b1011
+> dec: 10         hex: 0xa           oct: o12         bin: b1010
 ```
 
 ## TODO

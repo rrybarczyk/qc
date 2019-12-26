@@ -21,7 +21,8 @@ fn run(args: &[&str]) -> Result<Vec<isize>, Error> {
             ":div" => div_all(&mut stack)?,
             "pop" => pop(&mut stack).map(|_| ())?,
             "." => pop_print(&mut stack)?,
-            _ => num(&mut stack, word),
+            ":." => pop_print_all(&mut stack)?,
+            _ => num(&mut stack, word)?,
         }
 
         if opt.verbose {
@@ -36,6 +37,13 @@ fn main() -> Result<(), Error> {
     buffer.remove(0);
     let slice = buffer.iter().map(|s| s.as_str()).collect::<Vec<&str>>();
     run(&slice)?;
+    Ok(())
+}
+
+fn pop_print_all(stack: &mut Vec<isize>) -> Result<(), Error> {
+    while !stack.is_empty() {
+        pop_print(stack)?;
+    }
     Ok(())
 }
 
@@ -144,8 +152,29 @@ fn div_all(stack: &mut Vec<isize>) -> Result<(), Error> {
 }
 
 /// Parse arg as a number and push it onto the stack
-fn num(stack: &mut Vec<isize>, arg: &str) {
-    stack.push(arg.parse().unwrap());
+fn num(stack: &mut Vec<isize>, arg: &str) -> Result<(), Error> {
+    if arg.starts_with("0x") {
+        let arg = &arg[2..arg.len()];
+        stack.push(isize::from_str_radix(&arg, 16).unwrap());
+    } else if arg.starts_with("x") {
+        let arg = &arg[1..arg.len()];
+        stack.push(isize::from_str_radix(&arg, 16).unwrap());
+    } else if arg.starts_with("0o") {
+        let arg = &arg[2..arg.len()];
+        stack.push(isize::from_str_radix(&arg, 8).unwrap());
+    } else if arg.starts_with("o") {
+        let arg = &arg[1..arg.len()];
+        stack.push(isize::from_str_radix(&arg, 8).unwrap());
+    } else if arg.starts_with("0b") {
+        let arg = &arg[2..arg.len()];
+        stack.push(isize::from_str_radix(&arg, 2).unwrap());
+    } else if arg.starts_with("b") {
+        let arg = &arg[1..arg.len()];
+        stack.push(isize::from_str_radix(&arg, 2).unwrap());
+    } else {
+        stack.push(arg.parse().unwrap());
+    }
+    Ok(())
 }
 
 #[cfg(test)]
