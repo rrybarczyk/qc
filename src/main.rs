@@ -4,7 +4,7 @@ mod opt;
 
 use crate::common::*;
 
-fn run(args: &[&str]) -> Result<Vec<f64>, Error> {
+fn run(args: &[&str]) -> Result<Vec<isize>, Error> {
     let (flags, program): (Vec<&str>, Vec<&str>) = args.iter().partition(|f| f.starts_with("--"));
     let opt = Opt::from_iter(flags);
 
@@ -39,13 +39,13 @@ fn main() -> Result<(), Error> {
     Ok(())
 }
 
-fn pop_print(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn pop_print(stack: &mut Vec<isize>) -> Result<(), Error> {
     let item = pop(stack)?;
     println!("{}", item);
     Ok(())
 }
 
-fn pop(stack: &mut Vec<f64>) -> Result<f64, Error> {
+fn pop(stack: &mut Vec<isize>) -> Result<isize, Error> {
     match stack.pop() {
         Some(x) => Ok(x),
         None => Err(Error::StackUnderflow),
@@ -53,7 +53,7 @@ fn pop(stack: &mut Vec<f64>) -> Result<f64, Error> {
 }
 
 /// Pops top two items off the stack, adds them, and pushes the sum on the stack.
-fn add(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn add(stack: &mut Vec<isize>) -> Result<(), Error> {
     let a = pop(stack)?;
     let b = pop(stack)?;
     let sum = b + a;
@@ -62,7 +62,7 @@ fn add(stack: &mut Vec<f64>) -> Result<(), Error> {
 }
 
 /// Pops top two items off the stack, subtracts them, and pushes the difference on the stack.
-fn sub(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn sub(stack: &mut Vec<isize>) -> Result<(), Error> {
     let a = pop(stack)?;
     let b = pop(stack)?;
     let difference = b - a;
@@ -71,7 +71,7 @@ fn sub(stack: &mut Vec<f64>) -> Result<(), Error> {
 }
 
 /// Pops top two items off the stack, multiplies them, and pushes the product on the stack.
-fn mul(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn mul(stack: &mut Vec<isize>) -> Result<(), Error> {
     let a = pop(stack)?;
     let b = pop(stack)?;
     let product = b * a;
@@ -80,7 +80,7 @@ fn mul(stack: &mut Vec<f64>) -> Result<(), Error> {
 }
 
 /// Pops top two items off the stack, divides them, and pushes the quotient on the stack.
-fn div(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn div(stack: &mut Vec<isize>) -> Result<(), Error> {
     let a = pop(stack)?;
     let b = pop(stack)?;
     let quotient = b / a;
@@ -89,7 +89,7 @@ fn div(stack: &mut Vec<f64>) -> Result<(), Error> {
 }
 
 /// Pops all items before `:add` off the stack, adds them, and pushes the sum on the stack.
-fn add_all(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn add_all(stack: &mut Vec<isize>) -> Result<(), Error> {
     let a = pop(stack)?;
     let b = pop(stack)?;
     let mut sum = b + a;
@@ -102,7 +102,7 @@ fn add_all(stack: &mut Vec<f64>) -> Result<(), Error> {
 }
 
 /// Pops all items before `:sub` off the stack, subtracts them, and pushes the difference on the stack.
-fn sub_all(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn sub_all(stack: &mut Vec<isize>) -> Result<(), Error> {
     let a = pop(stack)?;
     let b = pop(stack)?;
     let mut difference = b - a;
@@ -115,7 +115,7 @@ fn sub_all(stack: &mut Vec<f64>) -> Result<(), Error> {
 }
 
 /// Pops all items before `:mul` off the stack, multiplies them, and pushes the product on the stack.
-fn mul_all(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn mul_all(stack: &mut Vec<isize>) -> Result<(), Error> {
     let a = pop(stack)?;
     let b = pop(stack)?;
     let mut product = b * a;
@@ -128,7 +128,7 @@ fn mul_all(stack: &mut Vec<f64>) -> Result<(), Error> {
 }
 
 /// Pops all items before `:div` off the stack, divides them, and pushes the quotient on the stack.
-fn div_all(stack: &mut Vec<f64>) -> Result<(), Error> {
+fn div_all(stack: &mut Vec<isize>) -> Result<(), Error> {
     let a = pop(stack)?;
     let b = pop(stack)?;
     let mut quotient = b / a;
@@ -141,7 +141,7 @@ fn div_all(stack: &mut Vec<f64>) -> Result<(), Error> {
 }
 
 /// Parse arg as a number and push it onto the stack
-fn num(stack: &mut Vec<f64>, arg: &str) {
+fn num(stack: &mut Vec<isize>, arg: &str) {
     stack.push(arg.parse().unwrap());
 }
 
@@ -155,7 +155,7 @@ mod tests {
         text.split_whitespace().collect()
     }
 
-    fn test(text: &str) -> Result<Vec<f64>, Error> {
+    fn test(text: &str) -> Result<Vec<isize>, Error> {
         run(&lex(text))
     }
 
@@ -169,7 +169,7 @@ mod tests {
             #[test]
             fn $name() {
                 let have = test($text).expect("Expected success");
-                let want = $want.iter().cloned().map(|x| x as f64).collect::<Vec<f64>>();
+                let want = $want.iter().cloned().map(|x| x as isize).collect::<Vec<isize>>();
                 assert_eq!(have, want);
             }
         };
