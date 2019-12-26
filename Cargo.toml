@@ -6,3 +6,6 @@ homepage    = "https://github.com/rrybarczyk/quick-calc"
 description = "An enhanced RPN cli tool for quick binary, octal, decimal, hexadecimal calcs."
 license     = "CC0-1.0"
 edition     = "2018"
+
+[dependencies]
+structopt = "0.3.5"

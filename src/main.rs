@@ -1,12 +1,16 @@
 mod common;
 mod error;
+mod opt;
+
 use crate::common::*;
 
-fn run(args: impl IntoIterator<Item = impl AsRef<str>>) -> Result<Vec<f64>, Error> {
+fn run(args: &[&str]) -> Result<Vec<f64>, Error> {
+    let (flags, program): (Vec<&str>, Vec<&str>) = args.iter().partition(|f| f.starts_with("--"));
+    let opt = Opt::from_iter(flags);
+
     let mut stack = Vec::new();
-    for arg in args {
-        let arg = arg.as_ref();
-        match arg {
+    for word in program {
+        match word {
             "add" => add(&mut stack)?,
             "sub" => sub(&mut stack)?,
             "mul" => mul(&mut stack)?,
@@ -17,20 +21,21 @@ fn run(args: impl IntoIterator<Item = impl AsRef<str>>) -> Result<Vec<f64>, Erro
             ":div" => div_all(&mut stack)?,
             "pop" => pop(&mut stack).map(|_| ())?,
             "." => pop_print(&mut stack)?,
-            _ => num(&mut stack, arg),
+            _ => num(&mut stack, word),
+        }
+
+        if opt.verbose {
+            println!("Stack:\t\t{:?}", &stack);
         }
     }
     Ok(stack)
 }
 
-fn lex(text: &str) -> Vec<String> {
-    text.split_whitespace().map(str::to_string).collect()
-}
-
 fn main() -> Result<(), Error> {
-    let mut args = std::env::args().collect::<Vec<String>>();
-    args.remove(0);
-    run(&args)?;
+    let mut buffer = std::env::args().collect::<Vec<String>>();
+    buffer.remove(0);
+    let slice = buffer.iter().map(|s| s.as_str()).collect::<Vec<&str>>();
+    run(&slice)?;
     Ok(())
 }
 
@@ -146,8 +151,12 @@ mod tests {
 
     /* Test helper function and macros */
 
+    fn lex(text: &str) -> Vec<&str> {
+        text.split_whitespace().collect()
+    }
+
     fn test(text: &str) -> Result<Vec<f64>, Error> {
-        run(lex(text))
+        run(&lex(text))
     }
 
     /// Tests intended to succeed
