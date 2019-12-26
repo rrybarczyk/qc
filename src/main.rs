@@ -41,7 +41,10 @@ fn main() -> Result<(), Error> {
 
 fn pop_print(stack: &mut Vec<isize>) -> Result<(), Error> {
     let item = pop(stack)?;
-    println!("{}", item);
+    println!(
+        "dec: {}\t\thex: 0x{:x}\t\toct: o{:o}\t\tbin: b{:b}",
+        item, item, item, item
+    );
     Ok(())
 }
 
