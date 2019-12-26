@@ -161,6 +161,8 @@ sub                     [ 600 ]                 600 - 0
 5                       [ 600 20 5 ]
 div                     [ 600 4 ]               20 / 5
 div                     [ 150 ]                 600 / 4
+
+> dec: 150                hex: 96          oct: o226              bin: b10010110 
 ```
 
 ### Enhanced RPN Capabilities
@@ -181,24 +183,26 @@ Script                  Stack                   Details
 20                      [ 600 20 ]
 5                       [ 600 20 5 ]
 :div                    [ 150 ]                 600 / (20 / 5)
+
+> dec: 150                hex: 96          oct: o226              bin: b10010110 
 ```
 
 ### Printing
 Pop of the top item on the stack and print it.
 ```
 $ qc 1 2 3 add add .
-> 6
+> dec: 6          hex: 6           oct: o6          bin: b110
 
-$ qc 8 32 div .
-> 4
+$ qc 32 8 div .
+> dec: 4          hex: 4           oct: o4                bin: b100
 
 $ qc 1 2 3 :add 4 5 :mul .
-> 120
+> dec: 120                hex: 78          oct: o170              bin: b1111000
 
 ```
 
 ## TODO
-- [ ] Hexadecimal, octal, and binary formatted print
+- [x] Hexadecimal, octal, and binary formatted print
 - [ ] Endianness swapping on all stack items plus formatted print
 ```
 $ qc 0xe803000000000000 0xd007000000000000 :endian
