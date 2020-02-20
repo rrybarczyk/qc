@@ -1,15 +1,34 @@
 # qc
 
-```
-$ cargo install qc
-```
-
 qc (short for quick calc) is an enhanced Reverse Polish notation (RPN) command line tool designed to assist with quick and dirty calcs.
-
 
 qc offers enhancements to a traditional RPN calculator including the use of a `:` before all operators that pops all items before it off the stack, performs the operation, and pushes the result onto the stack. Examples are included below.
 
+## Installation
+
+### Pre-built binaries
+
+Pre-built binaries for Linux, macOS, and Windows can be found on
+[the releases page](https://github.com/rrybarczyk/qc/releases).
+
+You can use the following command to download the latest binary for Linux,
+MacOS or Windows, just replace `DEST` with the directory where you'd like to
+install the `qc` binary:
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSf \
+  https://raw.githubusercontent.com/rrybarczyk/qc/master/bin/install \
+  | bash -s -- --to DEST
+```
+
+### Cargo
+
+`qc` is written in [Rust](https://www.rust-lang.org/) and can be built from
+source and installed with `cargo install qc`. To get Rust, use the
+[rustup installer](https://rustup.rs/).
+
 ## Operations
+
 ### Binary Operators
 - `add`     pops the top two items off the stack, adds them, and pushes the sum onto the stack
 - `sub`     pops the top two items off the stack, subtracts them, and pushes the difference onto the stack
@@ -28,8 +47,8 @@ qc offers enhancements to a traditional RPN calculator including the use of a `:
 #### Addition
 ```
 $ qc 1 2 add
-Script                  Stack                   Details 
-                                        
+Script                  Stack                   Details
+
                         [ ]
 1                       [ 1 ]
 2                       [ 1 2 ]
@@ -37,7 +56,7 @@ add                     [ 3 ]                   1 + 2
 
 
 $ qc 1 2 3 add add
-Script                  Stack                   Details 
+Script                  Stack                   Details
                         [ ]
 1                       [ 1 ]
 2                       [ 1 2 ]
@@ -48,15 +67,15 @@ add                     [ 6 ]                    1 + 5
 
 #### Subtraction
 ```
-$ qc 1 2 sub            
-Script                  Stack                   Details 
+$ qc 1 2 sub
+Script                  Stack                   Details
                         [ ]
 1                       [ 1 ]
 2                       [ 1 2 ]
 sub                     [ -1 ]                  1 - 2
 
 $ qc 1 2 3 sub sub
-Script                  Stack                   Details 
+Script                  Stack                   Details
                         [ ]
 1                       [ 1 ]
 2                       [ 1 2 ]
@@ -68,8 +87,8 @@ sub                     [ 2 ]                   1 - -1
 #### Multiplication
 ```
 $ qc 1 2 mul
-Script                  Stack                   Details 
-                                        
+Script                  Stack                   Details
+
                         [ ]
 1                       [ 1 ]
 2                       [ 1 2 ]
@@ -77,7 +96,7 @@ mul                     [ 2 ]                   1 * 2
 
 
 $ qc 1 2 3 mul mul
-Script                  Stack                   Details 
+Script                  Stack                   Details
                         [ ]
 1                       [ 1 ]
 2                       [ 1 2 ]
@@ -89,8 +108,8 @@ mul                     [ 6 ]                   1 * 6
 #### Division
 ```
 $ qc 3 9 div
-Script                  Stack                   Details 
-                                        
+Script                  Stack                   Details
+
                         [ ]
 3                       [ 3 ]
 9                       [ 3 9 ]
@@ -98,7 +117,7 @@ div                     [ 0.5 ]                 3 / 9
 
 
 $ qc 1 2 3 div div
-Script                  Stack                   Details 
+Script                  Stack                   Details
                         [ ]
 1                       [ 1 ]
 2                       [ 1 2 ]
@@ -111,7 +130,7 @@ div                     [ 6 ]                   6 * 1
 
 ```
 $ qc 4 7 9 add 2 8 mul mul mul
-Script                  Stack                   Details 
+Script                  Stack                   Details
 4                       [ 4 ]
 7                       [ 4 7 ]
 9                       [ 4 7 9 ]
@@ -125,7 +144,7 @@ mul                     [ 1024 ]                4 * 256
 
 ```
 $ qc 4 7 9 add 2 8 mul mul 4 div sub
-Script                  Stack                   Details 
+Script                  Stack                   Details
 4                       [ 4 ]
 7                       [ 4 7 ]
 9                       [ 4 7 9 ]
@@ -141,7 +160,7 @@ sub                     [ -60 ]                 4 - 64
 
 ```
 $ qc 4 7 9 add add  2 3 5 mul mul mul 1 1 sub sub 20 5 div div .
-Script                  Stack                   Details 
+Script                  Stack                   Details
 4                       [ 4 ]
 7                       [ 4 7 ]
 9                       [ 4 7 9 ]
@@ -162,13 +181,13 @@ sub                     [ 600 ]                 600 - 0
 div                     [ 600 4 ]               20 / 5
 div                     [ 150 ]                 600 / 4
 
-> dec: 150        hex: 0x96          oct: o226        bin: b10010110 
+> dec: 150        hex: 0x96          oct: o226        bin: b10010110
 ```
 
 ### Enhanced RPN Capabilities
 ```
 $ qc 4 7 9 :add 2 3 5 :mul 1 1 :sub 20 5 :div .
-Script                  Stack                   Details 
+Script                  Stack                   Details
 4                       [ 4 ]
 7                       [ 4 7 ]
 9                       [ 4 7 9 ]
@@ -184,7 +203,7 @@ Script                  Stack                   Details
 5                       [ 600 20 5 ]
 :div                    [ 150 ]                 600 / (20 / 5)
 
-> dec: 150        hex: 0x96          oct: o226        bin: b10010110 
+> dec: 150        hex: 0x96          oct: o226        bin: b10010110
 
 $ qc 0xa xb o22 b1101 :.
 > dec: 13         hex: 0xd           oct: o15         bin: b1101
