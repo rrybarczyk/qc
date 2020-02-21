@@ -238,14 +238,29 @@ $ qc 0xa xb o22 b1101 :.
 > dec: 10         hex: 0xa           oct: o12         bin: b1010
 ```
 
+
+### Endianness Swapping
+To swap the endianness of a value, the byte width is also required: `$ qc <value> <byte width> endian`.
+
+```
+$ qc 0xdeadbabe 4 endian .
+> dec: 3199905246         hex: 0xbebaadde         oct: o27656526736       bin: b10111110101110101010110111011110
+
+$ qc 0xdeadbabe 2 endian .
+> dec: 3735928506         hex: 0xdeadbeba         oct: o33653337272       bin: b11011110101011011011111010111010
+
+$ qc 0xe803000000000000 0xd007000000000000  8 :endian :.
+> dec: 2000               hex: 0x7d0              oct: o3720              bin: b11111010000
+> dec: 1000               hex: 0x3e8              oct: o1750              bin: b1111101000
+
+$ qc 0x1234000000000000 0x5678000000000000 8 :endian :.
+> dec: 30806              hex: 0x7856             oct: o74126             bin: b111100001010110
+> dec: 13330              hex: 0x3412             oct: o32022             bin: b11010000010010
+```
+
 ## TODO
 - [x] Hexadecimal, octal, and binary formatted print
-- [ ] Endianness swapping on all stack items plus formatted print
-```
-$ qc 0xe803000000000000 0xd007000000000000 :endian
-> dec: 1000     hex: 0x00000000000003e8     oct: o1750      bin: b01111101000
-> dec: 2000     hex: 0x07d0000000000000     oct: o3720      bin: b11111010000
-```
+- [x] Endianness swapping on all stack items plus formatted print
 - [ ] Hashing on all stack items
 ```
 qc 0x00000000000003e8 0x00000000000007d0 :sha256d
