@@ -4,7 +4,7 @@ mod opt;
 
 use crate::common::*;
 
-fn run(args: &[&str]) -> Result<Vec<i64>, Error> {
+fn run(args: &[&str]) -> Result<Vec<i128>, Error> {
   let (flags, program): (Vec<&str>, Vec<&str>) = args.iter().partition(|f| f.starts_with("--"));
   let opt = Opt::from_iter(flags);
 
@@ -34,14 +34,10 @@ fn run(args: &[&str]) -> Result<Vec<i64>, Error> {
   Ok(stack)
 }
 
-//  x y x y x y :endian
-//  x x x x x y :endian
-//  qc 0x1234000000000000 0x5678000000000000 :endian
-
 /// Pops one item off the stack, swaps endianness, pushes the result back on the stack.
-fn endian(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn endian(stack: &mut Vec<i128>) -> Result<(), Error> {
   let width = endian_width(stack)?;
-  let item = pop(stack)?; // 0x1234
+  let item = pop(stack)?;
 
   // Takes item and converts it to le representation
   let mut bytes = item.to_le_bytes();
@@ -49,32 +45,32 @@ fn endian(stack: &mut Vec<i64>) -> Result<(), Error> {
   // Takes first "width" bytes of le representation and it swaps those bytes
   let slice = &mut bytes[0..width as usize];
   slice.reverse();
-  let swapped = i64::from_le_bytes(bytes);
+  let swapped = i128::from_le_bytes(bytes);
   stack.push(swapped);
   Ok(())
 }
 
-fn endian_all(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn endian_all(stack: &mut Vec<i128>) -> Result<(), Error> {
   let width = endian_width(stack)?;
 
   stack
     .iter_mut()
-    .for_each(|value: &mut i64| *value = endian_op(*value, width));
+    .for_each(|value: &mut i128| *value = endian_op(*value, width));
 
   Ok(())
 }
 
 /// Takes first `width` bytes of le representation and it swaps those bytes.
-fn endian_op(value: i64, width: usize) -> i64 {
+fn endian_op(value: i128, width: usize) -> i128 {
   // Takes item and converts it to le representation
   let mut bytes = value.to_le_bytes();
   let slice = &mut bytes[0..width];
   slice.reverse();
-  i64::from_le_bytes(bytes)
+  i128::from_le_bytes(bytes)
 }
 
 /// Pop off byte width for endian handle error if too large or negative.
-fn endian_width(stack: &mut Vec<i64>) -> Result<usize, Error> {
+fn endian_width(stack: &mut Vec<i128>) -> Result<usize, Error> {
   let width = pop(stack)?; // 2
 
   if width < 0 || width > 8 {
@@ -91,14 +87,14 @@ fn main() -> Result<(), Error> {
   Ok(())
 }
 
-fn pop_print_all(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn pop_print_all(stack: &mut Vec<i128>) -> Result<(), Error> {
   while !stack.is_empty() {
     pop_print(stack)?;
   }
   Ok(())
 }
 
-fn pop_print(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn pop_print(stack: &mut Vec<i128>) -> Result<(), Error> {
   let item = pop(stack)?;
   println!(
     "dec: {}\t\thex: 0x{:x}\t\toct: o{:o}\t\tbin: b{:b}",
@@ -107,7 +103,7 @@ fn pop_print(stack: &mut Vec<i64>) -> Result<(), Error> {
   Ok(())
 }
 
-fn pop(stack: &mut Vec<i64>) -> Result<i64, Error> {
+fn pop(stack: &mut Vec<i128>) -> Result<i128, Error> {
   match stack.pop() {
     Some(x) => Ok(x),
     None => Err(Error::StackUnderflow),
@@ -115,7 +111,7 @@ fn pop(stack: &mut Vec<i64>) -> Result<i64, Error> {
 }
 
 /// Pops top two items off the stack, adds them, and pushes the sum on the stack.
-fn add(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn add(stack: &mut Vec<i128>) -> Result<(), Error> {
   let a = pop(stack)?;
   let b = pop(stack)?;
   let sum = b + a;
@@ -124,7 +120,7 @@ fn add(stack: &mut Vec<i64>) -> Result<(), Error> {
 }
 
 /// Pops top two items off the stack, subtracts them, and pushes the difference on the stack.
-fn sub(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn sub(stack: &mut Vec<i128>) -> Result<(), Error> {
   let a = pop(stack)?;
   let b = pop(stack)?;
   let difference = b - a;
@@ -133,7 +129,7 @@ fn sub(stack: &mut Vec<i64>) -> Result<(), Error> {
 }
 
 /// Pops top two items off the stack, multiplies them, and pushes the product on the stack.
-fn mul(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn mul(stack: &mut Vec<i128>) -> Result<(), Error> {
   let a = pop(stack)?;
   let b = pop(stack)?;
   let product = b * a;
@@ -142,7 +138,7 @@ fn mul(stack: &mut Vec<i64>) -> Result<(), Error> {
 }
 
 /// Pops top two items off the stack, divides them, and pushes the quotient on the stack.
-fn div(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn div(stack: &mut Vec<i128>) -> Result<(), Error> {
   let a = pop(stack)?;
   let b = pop(stack)?;
   let quotient = b / a;
@@ -151,7 +147,7 @@ fn div(stack: &mut Vec<i64>) -> Result<(), Error> {
 }
 
 /// Pops all items before `:add` off the stack, adds them, and pushes the sum on the stack.
-fn add_all(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn add_all(stack: &mut Vec<i128>) -> Result<(), Error> {
   let a = pop(stack)?;
   let b = pop(stack)?;
   let mut sum = b + a;
@@ -164,7 +160,7 @@ fn add_all(stack: &mut Vec<i64>) -> Result<(), Error> {
 }
 
 /// Pops all items before `:sub` off the stack, subtracts them, and pushes the difference on the stack.
-fn sub_all(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn sub_all(stack: &mut Vec<i128>) -> Result<(), Error> {
   let a = pop(stack)?;
   let b = pop(stack)?;
   let mut difference = b - a;
@@ -177,7 +173,7 @@ fn sub_all(stack: &mut Vec<i64>) -> Result<(), Error> {
 }
 
 /// Pops all items before `:mul` off the stack, multiplies them, and pushes the product on the stack.
-fn mul_all(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn mul_all(stack: &mut Vec<i128>) -> Result<(), Error> {
   let a = pop(stack)?;
   let b = pop(stack)?;
   let mut product = b * a;
@@ -190,7 +186,7 @@ fn mul_all(stack: &mut Vec<i64>) -> Result<(), Error> {
 }
 
 /// Pops all items before `:div` off the stack, divides them, and pushes the quotient on the stack.
-fn div_all(stack: &mut Vec<i64>) -> Result<(), Error> {
+fn div_all(stack: &mut Vec<i128>) -> Result<(), Error> {
   let a = pop(stack)?;
   let b = pop(stack)?;
   let mut quotient = b / a;
@@ -203,25 +199,25 @@ fn div_all(stack: &mut Vec<i64>) -> Result<(), Error> {
 }
 
 /// Parse arg as a number and push it onto the stack
-fn num(stack: &mut Vec<i64>, arg: &str) -> Result<(), Error> {
+fn num(stack: &mut Vec<i128>, arg: &str) -> Result<(), Error> {
   if arg.starts_with("0x") {
     let arg = &arg[2..arg.len()];
-    stack.push(i64::from_str_radix(&arg, 16).unwrap());
+    stack.push(i128::from_str_radix(&arg, 16).unwrap());
   } else if arg.starts_with("x") {
     let arg = &arg[1..arg.len()];
-    stack.push(i64::from_str_radix(&arg, 16).unwrap());
+    stack.push(i128::from_str_radix(&arg, 16).unwrap());
   } else if arg.starts_with("0o") {
     let arg = &arg[2..arg.len()];
-    stack.push(i64::from_str_radix(&arg, 8).unwrap());
+    stack.push(i128::from_str_radix(&arg, 8).unwrap());
   } else if arg.starts_with("o") {
     let arg = &arg[1..arg.len()];
-    stack.push(i64::from_str_radix(&arg, 8).unwrap());
+    stack.push(i128::from_str_radix(&arg, 8).unwrap());
   } else if arg.starts_with("0b") {
     let arg = &arg[2..arg.len()];
-    stack.push(i64::from_str_radix(&arg, 2).unwrap());
+    stack.push(i128::from_str_radix(&arg, 2).unwrap());
   } else if arg.starts_with("b") {
     let arg = &arg[1..arg.len()];
-    stack.push(i64::from_str_radix(&arg, 2).unwrap());
+    stack.push(i128::from_str_radix(&arg, 2).unwrap());
   } else {
     stack.push(arg.parse().unwrap());
   }
@@ -238,7 +234,7 @@ mod tests {
     text.split_whitespace().collect()
   }
 
-  fn test(text: &str) -> Result<Vec<i64>, Error> {
+  fn test(text: &str) -> Result<Vec<i128>, Error> {
     run(&lex(text))
   }
 
@@ -252,7 +248,7 @@ mod tests {
             #[test]
             fn $name() {
                 let have = test($text).expect("Expected success");
-                let want = $want.iter().cloned().map(|x: i64| x).collect::<Vec<i64>>();
+                let want = $want.iter().cloned().map(|x: i128| x).collect::<Vec<i128>>();
                 assert_eq!(have, want);
             }
         };
@@ -497,31 +493,51 @@ mod tests {
       want: [0x12],
   }
 
-  // $ qc 0xbabe endian
   test! {
       name: endian_one_args_0,
       text: "0x1234 2 endian",
       want: [0x3412],
   }
 
-  // $ qc 0xbabe endian
   test! {
       name: endian_one_args_1,
       text: "0xbabe 2 endian",
       want: [0xbeba],
   }
 
-  // $ qc 0x1234000000000000 0x5678000000000000 :endian
   test! {
-      name: endian_all_two_args_0,
+      name: endian_one_arg_8_bytes_0,
+      text: "0xe803000000000000 8 endian",
+      want: [0x00000000000003e8],
+  }
+
+  test! {
+      name: endian_one_arg_8_bytes_1,
+      text: "0x00000000000007d0 8 endian",
+      want: [0xd007000000000000],
+  }
+
+  test! {
+      name: endian_one_arg_8_bytes_2,
+      text: "0xd007000000000000 8 endian",
+      want: [0x00000000000007d0],
+  }
+
+  test! {
+      name: endian_all_two_args_4_bytes,
+      text: "0xdeadbeef 0xbabebeef 4 :endian",
+      want: [0xefbeadde, 0xefbebeba],
+  }
+
+  test! {
+      name: endian_all_two_args_8_bytes_0,
       text: "0x1234000000000000 0x5678000000000000 8 :endian",
       want: [0x0000000000003412, 0x0000000000007856],
   }
 
-  // $ qc 0xdeadbeef 0xbabebeef :endian
   test! {
-      name: endian_all_two_args_1,
-      text: "0xdeadbeef 0xbabebeef 4 :endian",
-      want: [0xefbeadde, 0xefbebeba],
+      name: endian_all_two_args_8_bytes_1,
+      text: "0xe803000000000000 0xd007000000000000  8 :endian",
+      want: [0x00000000000003e8, 0x00000000000007d0],
   }
 }

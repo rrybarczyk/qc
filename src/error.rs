@@ -4,7 +4,7 @@ use crate::common::*;
 pub(crate) enum Error {
   StackUnderflow,
   ParseError(ParseIntError),
-  EndianWidth { width: i64 },
+  EndianWidth { width: i128 },
 }
 
 impl From<ParseIntError> for Error {
