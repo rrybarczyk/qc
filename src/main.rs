@@ -528,4 +528,10 @@ mod tests {
     text: "0xe803000000000000 0xd007000000000000  8 :endian",
     want: [0x00000000000003e8, 0x00000000000007d0],
   }
+
+  test! {
+    name: endian_negative_10,
+    text: "0xfffffffffffffff6 8 :endian",
+    want: [0xf6ffffffffffffff],
+  }
 }
